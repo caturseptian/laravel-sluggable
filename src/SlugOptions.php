@@ -7,19 +7,26 @@ class SlugOptions
     /** @var array|callable */
     public $generateSlugFrom;
 
-    public string $slugField;
+    /** @var string */
+    public $slugField;
 
-    public bool $generateUniqueSlugs = true;
+    /** @var bool */
+    public $generateUniqueSlugs = true;
 
-    public int $maximumLength = 250;
+    /** @var int */
+    public $maximumLength = 250;
 
-    public bool $generateSlugsOnCreate = true;
+    /** @var bool */
+    public $generateSlugsOnCreate = true;
 
-    public bool $generateSlugsOnUpdate = true;
+    /** @var bool */
+    public $generateSlugsOnUpdate = true;
 
-    public string $slugSeparator = '-';
+    /** @var string */
+    public $slugSeparator = '-';
 
-    public string $slugLanguage = 'en';
+    /** @var string */
+    public $slugLanguage = 'en';
 
     public static function create(): self
     {
