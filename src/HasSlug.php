@@ -2,12 +2,13 @@
 
 namespace Spatie\Sluggable;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 trait HasSlug
 {
-    protected SlugOptions $slugOptions;
+    /** @var \Spatie\Sluggable\SlugOptions */
+    protected $slugOptions;
 
     abstract public function getSlugOptions(): SlugOptions;
 
@@ -93,7 +94,9 @@ trait HasSlug
         }
 
         $slugSourceString = collect($this->slugOptions->generateSlugFrom)
-            ->map(fn (string $fieldName): string => data_get($this, $fieldName, ''))
+            ->map(function (string $fieldName) : string {
+                return data_get($this, $fieldName, '');
+            })
             ->implode($this->slugOptions->slugSeparator);
 
         return substr($slugSourceString, 0, $this->slugOptions->maximumLength);
@@ -116,7 +119,7 @@ trait HasSlug
         $key = $this->getKey();
 
         if ($this->incrementing) {
-            $key ??= '0';
+            $key = $key ?? '0';
         }
 
         $query = static::where($this->slugOptions->slugField, $slug)
@@ -130,9 +133,13 @@ trait HasSlug
         return $query->exists();
     }
 
-    protected function usesSoftDeletes(): bool
+    protected function usesSoftDeletes()
     {
-        return (bool) in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this));
+        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($this))) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function ensureValidSlugOptions()
