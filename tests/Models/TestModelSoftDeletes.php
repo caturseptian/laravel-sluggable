@@ -1,16 +1,18 @@
 <?php
 
-namespace Spatie\Sluggable\Tests;
+namespace Caturseptian\Sluggable\Tests\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Caturseptian\Sluggable\HasSlug;
+use Caturseptian\Sluggable\SlugOptions;
 
-class TestModel extends Model
+class TestModelSoftDeletes extends Model
 {
-    use HasSlug;
+    use SoftDeletes,
+        HasSlug;
 
-    protected $table = 'test_models';
+    protected $table = 'test_model_soft_deletes';
 
     protected $guarded = [];
 

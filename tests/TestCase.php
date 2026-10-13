@@ -1,72 +1,53 @@
 <?php
 
-namespace Spatie\Sluggable\Tests;
+namespace Caturseptian\Sluggable\Tests;
 
-use File;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Spatie\Sluggable\Tests\TestModel */
-    protected $testModel;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->setUpDatabase($this->app);
+        $this->setUpDatabase();
     }
 
-    /**
-     * @param Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
-        $this->initializeDirectory($this->getTempDirectory());
-
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
             'driver' => 'sqlite',
-            'database' => $this->getTempDirectory().'/database.sqlite',
+            'database' => ':memory:',
             'prefix' => '',
         ]);
     }
 
-    /**
-     * @param  $app
-     */
-    protected function setUpDatabase(Application $app)
+    protected function setUpDatabase()
     {
-        file_put_contents($this->getTempDirectory().'/database.sqlite', null);
+        $schema = $this->app['db']->connection()->getSchemaBuilder();
 
-        $app['db']->connection()->getSchemaBuilder()->create('test_models', function (Blueprint $table) {
+        $schema->create('test_models', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
             $table->string('other_field')->nullable();
             $table->string('url')->nullable();
+            $table->integer('tenant_id')->nullable();
         });
 
-        $app['db']->connection()->getSchemaBuilder()->create('test_model_soft_deletes', function (Blueprint $table) {
+        $schema->create('test_model_soft_deletes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
             $table->string('other_field')->nullable();
             $table->string('url')->nullable();
             $table->softDeletes();
         });
-    }
 
-    protected function initializeDirectory(string $directory)
-    {
-        if (File::isDirectory($directory)) {
-            File::deleteDirectory($directory);
-        }
-        File::makeDirectory($directory);
-    }
-
-    public function getTempDirectory(): string
-    {
-        return __DIR__.'/temp';
+        $schema->create('test_uuid_models', function (Blueprint $table) {
+            $table->string('id')->nullable();
+            $table->string('name')->nullable();
+            $table->string('url')->nullable();
+        });
     }
 }
