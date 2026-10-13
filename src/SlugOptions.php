@@ -140,4 +140,11 @@ class SlugOptions
 
         return $this;
     }
+
+    public function indonesian(?callable $configure = null): self
+    {
+        $this->indonesianRules = IndonesianRules::configure($configure);
+
+        return $this;
+    }
 }

@@ -4,7 +4,6 @@ namespace Caturseptian\Sluggable;
 
 use Caturseptian\Sluggable\Exceptions\InvalidOption;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 trait HasSlug
 {
@@ -96,7 +95,12 @@ trait HasSlug
 
     protected function buildSlug(string $source): string
     {
-        return Str::slug($source, $this->slugOptions->slugSeparator, $this->slugOptions->slugLanguage);
+        return Slug::make(
+            $source,
+            $this->slugOptions->slugSeparator,
+            $this->slugOptions->slugLanguage,
+            $this->slugOptions->indonesianRules
+        );
     }
 
     protected function truncateSlug(string $slug, int $length): string
