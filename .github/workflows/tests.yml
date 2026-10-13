@@ -1,0 +1,53 @@
+name: tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { laravel: 6, testbench: 4, php: '7.2' }
+          - { laravel: 6, testbench: 4, php: '8.0' }
+          - { laravel: 7, testbench: 5, php: '7.3' }
+          - { laravel: 7, testbench: 5, php: '8.0' }
+          - { laravel: 8, testbench: 6, php: '7.3' }
+          - { laravel: 8, testbench: 6, php: '8.1' }
+          - { laravel: 9, testbench: 7, php: '8.0' }
+          - { laravel: 9, testbench: 7, php: '8.2' }
+          - { laravel: 10, testbench: 8, php: '8.1' }
+          - { laravel: 10, testbench: 8, php: '8.3' }
+          - { laravel: 11, testbench: 9, php: '8.2' }
+          - { laravel: 11, testbench: 9, php: '8.4' }
+          - { laravel: 12, testbench: 10, php: '8.2' }
+          - { laravel: 12, testbench: 10, php: '8.4' }
+          - { laravel: 13, testbench: 11, php: '8.3' }
+          - { laravel: 13, testbench: 11, php: '8.5' }
+
+    name: L${{ matrix.laravel }} / PHP ${{ matrix.php }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php: ${{ matrix.php }}
+          extensions: pdo_sqlite, sqlite3, mbstring
+          coverage: none
+
+      - name: Izinkan paket Laravel lama yang punya advisory (khusus CI)
+        run: composer config audit.block-insecure false
+
+      - name: Kunci versi Laravel
+        run: |
+          composer require --no-update --no-interaction "illuminate/database:^${{ matrix.laravel }}.0" "illuminate/support:^${{ matrix.laravel }}.0"
+          composer require --no-update --no-interaction --dev "orchestra/testbench:^${{ matrix.testbench }}.0"
+
+      - run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - run: vendor/bin/phpunit
