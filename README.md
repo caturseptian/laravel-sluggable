@@ -1,269 +1,148 @@
-# Generate slugs when saving Eloquent models
+# Laravel Sluggable
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-sluggable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-sluggable)
-[![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/spatie/laravel-sluggable/run-tests?label=tests)
-[![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-sluggable.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-sluggable)
-[![StyleCI](https://styleci.io/repos/48512561/shield?branch=master)](https://styleci.io/repos/48512561)
-[![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-sluggable.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-sluggable)
+[![tests](https://github.com/caturseptian/laravel-sluggable/actions/workflows/tests.yml/badge.svg)](https://github.com/caturseptian/laravel-sluggable/actions/workflows/tests.yml)
+[![Packagist](https://img.shields.io/packagist/v/caturseptian/laravel-sluggable.svg)](https://packagist.org/packages/caturseptian/laravel-sluggable)
 
-This package provides a trait that will generate a unique slug when saving any Eloquent model. 
+[English](README.en.md)
 
-```php
-$model = new EloquentModel();
-$model->name = 'activerecord is awesome';
-$model->save();
+Membuat slug otomatis saat model Eloquent disimpan, dengan aturan yang paham bahasa Indonesia.
 
-echo $model->slug; // ouputs "activerecord-is-awesome"
-```
+- **Paham Indonesia** — `PT Bank Rakyat Indonesia (Persero) Tbk` → `bank-rakyat-indonesia`, `Kab. Bandung Barat` → `kabupaten-bandung-barat`.
+- **Laravel 6 sampai 13** dalam satu paket (PHP 7.2–8.5).
+- **Bisa tanpa ketergantungan** — pasang saat pengembangan, `php artisan sluggable:eject`, lalu hapus paketnya.
 
-The slugs are generated with Laravels `Str::slug` method, whereby spaces are converted to '-'.
+## Instalasi
 
-Spatie is a webdesign agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
+### Mode dependent (paket tetap dipasang)
 
-## Support us
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us). 
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
-
-
-## Installation
-
-You can install the package via composer:
-``` bash
+```bash
 composer require caturseptian/laravel-sluggable
 ```
 
-## Usage
+> Pasang di `require`, **bukan** `require-dev`, kecuali Anda akan melakukan eject. Tanpa eject,
+> `composer install --no-dev` di production membuat aplikasi galat *class not found*.
 
-Your Eloquent models should use the `Spatie\Sluggable\HasSlug` trait and the `Spatie\Sluggable\SlugOptions` class.
+### Mode eject (tanpa ketergantungan)
 
-The trait contains an abstract method `getSlugOptions()` that you must implement yourself. 
+```bash
+composer require --dev caturseptian/laravel-sluggable
+php artisan sluggable:eject --dry-run   # lihat file yang akan dibuat/diubah
+php artisan sluggable:eject
+composer remove caturseptian/laravel-sluggable
+```
 
-Your models' migrations should have a field to save the generated slug to.
+Eject menyalin kode ke `app/Support/Sluggable` (namespace `App\Support\Sluggable`), mengganti
+import `Caturseptian\Sluggable\...` di folder `app/`, dan menyertakan `LICENSE-sluggable`.
+Opsi: `--path=`, `--namespace=`, `--scan=` (bisa berulang, mis. `--scan=app --scan=database`),
+`--dry-run`, `--force`.
 
-Here's an example of how to implement the trait:
+## Pemakaian
 
 ```php
-<?php
-
-namespace App;
-
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
+use Caturseptian\Sluggable\HasSlug;
+use Caturseptian\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Model;
 
-class YourEloquentModel extends Model
+class Perusahaan extends Model
 {
     use HasSlug;
-    
-    /**
-     * Get the options for generating the slug.
-     */
-    public function getSlugOptions() : SlugOptions
+
+    public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
-            ->generateSlugsFrom('name')
+            ->generateSlugsFrom('nama')
             ->saveSlugsTo('slug');
     }
 }
 ```
 
-With its migration:
+Migrasi: `$table->string('slug')->unique();`
+
+### Opsi
+
+| Metode | Keterangan |
+|---|---|
+| `generateSlugsFrom('judul')` / `(['judul', 'kota'])` / `(function ($model) { ... })` | sumber slug |
+| `saveSlugsTo('slug')` | kolom tujuan |
+| `allowDuplicateSlugs()` | tanpa suffix keunikan |
+| `slugsShouldBeNoLongerThan(100)` | panjang maksimum (default 250, termasuk suffix) |
+| `usingSeparator('_')` | pemisah (default `-`) |
+| `usingLanguage('de')` | bahasa transliterasi `Str::slug` (default `en`) |
+| `doNotGenerateSlugsOnCreate()` / `doNotGenerateSlugsOnUpdate()` | matikan pada event tertentu |
+| `preventOverwrite()` | jangan timpa slug yang sudah terisi |
+| `skipGenerateWhen(function ($model) { return ...; })` | lewati kondisi tertentu |
+| `extraScope(function ($query) { $query->where('tenant_id', 1); })` | keunikan per lingkup |
+| `startSlugSuffixFrom(2)` | suffix pertama (default 1) |
+| `indonesian()` / `indonesian(function ($rules) { ... })` | aturan Indonesia |
+
+### Aturan Indonesia
 
 ```php
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-class CreateYourEloquentModelTable extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('your_eloquent_models', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('slug'); // Field name same as your `saveSlugsTo`
-            $table->string('name');
-            $table->timestamps();
-        });
-    }
-}
-
+SlugOptions::create()
+    ->generateSlugsFrom('nama')
+    ->saveSlugsTo('slug')
+    ->indonesian(function ($rules) {
+        return $rules
+            ->expandAbbreviations()   // Kab. → kabupaten, Jl. → jalan, No. → nomor, ...
+            ->dropLegalEntity()       // PT, CV, UD, Tbk, (Persero), Perum, Koperasi, Yayasan, ...
+            ->dropStopwords();        // dan, di, ke, dari, yang, untuk, ...
+    });
 ```
 
-To use the generated slug in routes, remember to use Laravel's [implicit route model binding](https://laravel.com/docs/5.8/routing#implicit-binding):
+`indonesian()` tanpa argumen hanya memperluas singkatan. Bila aturan menghapus seluruh teks
+(mis. nama hanya `PT`), slug dibuat dari teks asli (`pt`).
+
+| Masukan | Aturan | Slug |
+|---|---|---|
+| PT Bank Rakyat Indonesia (Persero) Tbk | dropLegalEntity | `bank-rakyat-indonesia` |
+| Kab. Bandung Barat | expandAbbreviations | `kabupaten-bandung-barat` |
+| Jl. Gatot Subroto No. 10 | expandAbbreviations | `jalan-gatot-subroto-nomor-10` |
+| Toko Buku dan Alat Tulis | dropStopwords | `toko-buku-alat-tulis` |
+
+Daftar lengkap ada di `src/Indonesian/Dictionary.php`.
+
+### Di luar model
 
 ```php
-namespace App;
+use Caturseptian\Sluggable\Slug;
 
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Illuminate\Database\Eloquent\Model;
-
-class YourEloquentModel extends Model
-{
-    use HasSlug;
-    
-    /**
-     * Get the options for generating the slug.
-     */
-    public function getSlugOptions() : SlugOptions
-    {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
-    }
-    
-    /**
-     * Get the route key for the model.
-     *
-     * @return string
-     */
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
-}
+Slug::make('Judul Artikel');            // judul-artikel
+Slug::indonesia('Kab. Bandung Barat');  // kabupaten-bandung-barat
 ```
 
-Want to use multiple field as the basis for a slug? No problem!
+`Slug` tidak memeriksa database, jadi tidak menjamin keunikan.
 
-```php
-public function getSlugOptions() : SlugOptions
-{
-    return SlugOptions::create()
-        ->generateSlugsFrom(['first_name', 'last_name'])
-        ->saveSlugsTo('slug');
-}
-```
+## Kompatibilitas
 
-You can also pass a `callable` to `generateSlugsFrom`.
+| Laravel | PHP |
+|---|---|
+| 6, 7 | 7.2 / 7.3 – 8.0 |
+| 8 | 7.3 – 8.1 |
+| 9 | 8.0 – 8.2 |
+| 10 | 8.1 – 8.3 |
+| 11, 12 | 8.2 – 8.4 |
+| 13 | 8.3 – 8.5 |
 
-By default the package will generate unique slugs by appending '-' and a number, to a slug that already exists.
+Setiap baris diuji di CI.
 
-You can disable this behaviour by calling `allowDuplicateSlugs`.
+## Pindah dari spatie/laravel-sluggable
 
-```php
-public function getSlugOptions() : SlugOptions
-{
-    return SlugOptions::create()
-        ->generateSlugsFrom('name')
-        ->saveSlugsTo('slug')
-        ->allowDuplicateSlugs();
-}
-```
+Nama metode `SlugOptions` sama. Ganti `use Spatie\Sluggable\...` menjadi
+`use Caturseptian\Sluggable\...`. Fitur Spatie v4 seperti URL *self-healing*, slug
+multibahasa (`HasTranslatableSlug`), dan atribut `#[Sluggable]` tidak tersedia di sini —
+bila Anda membutuhkannya, pakai [spatie/laravel-sluggable](https://github.com/spatie/laravel-sluggable).
 
-You can also put a maximum size limit on the created slug:
+## Pengujian
 
-```php
-public function getSlugOptions() : SlugOptions
-{
-    return SlugOptions::create()
-        ->generateSlugsFrom('name')
-        ->saveSlugsTo('slug')
-        ->slugsShouldBeNoLongerThan(50);
-}
-```
-
-The slug may be slightly longer than the value specified, due to the suffix which is added to make it unique.
-
-You can also use a custom separator by calling `usingSeparator`
-
-```php
-public function getSlugOptions() : SlugOptions
-{
-    return SlugOptions::create()
-        ->generateSlugsFrom('name')
-        ->saveSlugsTo('slug')
-        ->usingSeparator('_');
-}
-```
-
-To set the language used by `Str::slug` you may call `usingLanguage`
-
-```php
-public function getSlugOptions() : SlugOptions
-{
-    return SlugOptions::create()
-        ->generateSlugsFrom('name')
-        ->saveSlugsTo('slug')
-        ->usingLanguage('nl');
-}
-```
-
-You can also override the generated slug just by setting it to another value than the generated slug.
-
-```php
-$model = EloquentModel:create(['name' => 'my name']); //slug is now "my-name"; 
-$model->slug = 'my-custom-url';
-$model->save(); //slug is now "my-custom-url"; 
-```
-
-If you don't want to create the slug when the model is initially created you can set use the `doNotGenerateSlugsOnCreate()` function.
-
-```php
-public function getSlugOptions() : SlugOptions
-{
-    return SlugOptions::create()
-        ->generateSlugsFrom('name')
-        ->saveSlugsTo('slug')
-        ->doNotGenerateSlugsOnCreate();
-}
-```
-
-Similarly, if you want to prevent the slug from being updated on model updates, call `doNotGenerateSlugsOnUpdate()`.
-
-```php
-public function getSlugOptions() : SlugOptions
-{
-    return SlugOptions::create()
-        ->generateSlugsFrom('name')
-        ->saveSlugsTo('slug')
-        ->doNotGenerateSlugsOnUpdate();
-}
-```
-
-This can be helpful for creating permalinks that don't change until you explicitly want it to.
-
-```php
-$model = EloquentModel:create(['name' => 'my name']); //slug is now "my-name"; 
-$model->save();
-
-$model->name = 'changed name';
-$model->save(); //slug stays "my-name"
-```
-
-If you want to explicitly update the slug on the model you can call `generateSlug()` on your model at any time to make the slug according to your other options. Don't forget to `save()` the model to persist the update to your database.
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
-
-## Testing
-
-``` bash
+```bash
 composer test
 ```
 
-## Contributing
+## Kredit
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Berawal dari [spatie/laravel-sluggable](https://github.com/spatie/laravel-sluggable) karya
+Freek Van der Herten dan Spatie. Dikembangkan dan dirawat oleh [Tian](https://github.com/caturseptian).
 
-## Security
+## Lisensi
 
-If you discover any security related issues, please email freek@spatie.be instead of using the issue tracker.
-
-## Credits
-
-- [Freek Van der Herten](https://github.com/freekmurze)
-- [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+MIT. Lihat [LICENSE.md](LICENSE.md).
