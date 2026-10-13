@@ -2,13 +2,15 @@
 
 namespace Caturseptian\Sluggable;
 
+use Caturseptian\Sluggable\Indonesian\IndonesianRules;
+
 class SlugOptions
 {
     /** @var array|callable */
     public $generateSlugFrom;
 
     /** @var string */
-    public $slugField;
+    public $slugField = '';
 
     /** @var bool */
     public $generateUniqueSlugs = true;
@@ -22,11 +24,26 @@ class SlugOptions
     /** @var bool */
     public $generateSlugsOnUpdate = true;
 
+    /** @var bool */
+    public $preventOverwrite = false;
+
     /** @var string */
     public $slugSeparator = '-';
 
     /** @var string */
     public $slugLanguage = 'en';
+
+    /** @var callable|null */
+    public $skipGenerate;
+
+    /** @var callable|null */
+    public $extraScope;
+
+    /** @var int */
+    public $startSlugSuffixFrom = 1;
+
+    /** @var \Caturseptian\Sluggable\Indonesian\IndonesianRules|null */
+    public $indonesianRules;
 
     public static function create(): self
     {
@@ -35,8 +52,6 @@ class SlugOptions
 
     /**
      * @param string|array|callable $fieldName
-     *
-     * @return \Caturseptian\Sluggable\SlugOptions
      */
     public function generateSlugsFrom($fieldName): self
     {
@@ -84,6 +99,13 @@ class SlugOptions
         return $this;
     }
 
+    public function preventOverwrite(): self
+    {
+        $this->preventOverwrite = true;
+
+        return $this;
+    }
+
     public function usingSeparator(string $separator): self
     {
         $this->slugSeparator = $separator;
@@ -94,6 +116,27 @@ class SlugOptions
     public function usingLanguage(string $language): self
     {
         $this->slugLanguage = $language;
+
+        return $this;
+    }
+
+    public function skipGenerateWhen(callable $callback): self
+    {
+        $this->skipGenerate = $callback;
+
+        return $this;
+    }
+
+    public function extraScope(callable $callback): self
+    {
+        $this->extraScope = $callback;
+
+        return $this;
+    }
+
+    public function startSlugSuffixFrom(int $start): self
+    {
+        $this->startSlugSuffixFrom = $start;
 
         return $this;
     }

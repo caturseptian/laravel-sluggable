@@ -20,4 +20,9 @@ class InvalidOption extends Exception
     {
         return new static('Maximum length should be greater than zero');
     }
+
+    public static function invalidSuffixStart()
+    {
+        return new static('Slug suffix should start from one or higher');
+    }
 }
