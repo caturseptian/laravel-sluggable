@@ -42,6 +42,13 @@
     "config": {
         "sort-packages": true
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Caturseptian\\Sluggable\\SluggableServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
