@@ -1,40 +1,46 @@
 {
     "name": "caturseptian/laravel-sluggable",
-    "description": "Generate slugs when saving Eloquent models",
-    "keywords": [
-        "spatie",
-        "laravel-sluggable"
-    ],
-    "homepage": "https://github.com/spatie/laravel-sluggable",
+    "description": "Slug Eloquent yang paham bahasa Indonesia untuk Laravel 6–13, bisa di-eject agar tanpa ketergantungan",
+    "keywords": ["laravel", "eloquent", "slug", "sluggable", "indonesia", "bahasa-indonesia"],
+    "homepage": "https://github.com/caturseptian/laravel-sluggable",
     "license": "MIT",
     "authors": [
+        {
+            "name": "Catur Septian",
+            "homepage": "https://github.com/caturseptian",
+            "role": "Maintainer"
+        },
         {
             "name": "Freek Van der Herten",
             "email": "freek@spatie.be",
             "homepage": "https://spatie.be",
-            "role": "Developer"
+            "role": "Original author"
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "illuminate/database": "^7.0",
-        "illuminate/support": "^7.0"
+        "php": "^7.2|^8.0",
+        "illuminate/database": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0"
     },
     "require-dev": {
-        "orchestra/testbench-core": "^5.0"
+        "orchestra/testbench": "^4.0|^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+        "phpunit/phpunit": "^8.5|^9.5|^10.5|^11.0|^12.0"
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Sluggable\\": "src"
+            "Caturseptian\\Sluggable\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Sluggable\\Tests\\": "tests"
+            "Caturseptian\\Sluggable\\Tests\\": "tests"
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
     },
     "minimum-stability": "dev",
     "prefer-stable": true

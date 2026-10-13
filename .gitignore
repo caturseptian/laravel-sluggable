@@ -1,6 +1,5 @@
-build
+/vendor
 composer.lock
-docs
-vendor
-tests/Integration/temp
 .phpunit.result.cache
+.phpunit.cache
+/build
