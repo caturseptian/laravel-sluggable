@@ -14,6 +14,19 @@ abstract class TestCase extends Orchestra
         $this->setUpDatabase();
     }
 
+    protected function getPackageProviders($app)
+    {
+        return [\Caturseptian\Sluggable\SluggableServiceProvider::class];
+    }
+
+    /**
+     * Pengganti assertFileDoesNotExist (baru ada di PHPUnit 9.1).
+     */
+    protected function assertPathMissing(string $path, string $message = '')
+    {
+        $this->assertFalse(file_exists($path), $message ?: "{$path} seharusnya tidak ada");
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'sqlite');
