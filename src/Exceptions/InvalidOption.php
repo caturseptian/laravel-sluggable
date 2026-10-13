@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Sluggable;
+namespace Caturseptian\Sluggable\Exceptions;
 
 use Exception;
 

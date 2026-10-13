@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Sluggable;
+namespace Caturseptian\Sluggable;
 
 class SlugOptions
 {
@@ -36,7 +36,7 @@ class SlugOptions
     /**
      * @param string|array|callable $fieldName
      *
-     * @return \Spatie\Sluggable\SlugOptions
+     * @return \Caturseptian\Sluggable\SlugOptions
      */
     public function generateSlugsFrom($fieldName): self
     {

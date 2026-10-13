@@ -1,13 +1,14 @@
 <?php
 
-namespace Spatie\Sluggable;
+namespace Caturseptian\Sluggable;
 
+use Caturseptian\Sluggable\Exceptions\InvalidOption;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 trait HasSlug
 {
-    /** @var \Spatie\Sluggable\SlugOptions */
+    /** @var \Caturseptian\Sluggable\SlugOptions */
     protected $slugOptions;
 
     abstract public function getSlugOptions(): SlugOptions;
