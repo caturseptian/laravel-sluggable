@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 - 2026-10-14
+
+- Slug unik tidak lagi diam-diam melebihi `slugsShouldBeNoLongerThan` saat batasnya lebih pendek dari suffix (mis. batas 1 dengan suffix `-1`); kini dilempar `InvalidOption`.
+- `sluggable:eject` atomik: semua file ditulis ke lokasi sementara dulu dan baru dipindahkan bila semuanya berhasil, sehingga galat tulis tidak meninggalkan aplikasi setengah ter-eject.
+
 ## 1.0.1 - 2026-10-14
 
 - `dropStopwords` tidak lagi membuang bentuk bertanda hubung: "HUT RI Ke-80" tetap `hut-ri-ke-80`.
