@@ -67,7 +67,6 @@ class IndonesianRulesTest extends TestCase
             'CV Maju Jaya' => 'Maju Jaya',
             'CV. Maju Jaya' => 'Maju Jaya',
             'UD Sumber Rejeki' => 'Sumber Rejeki',
-            'Perum Bulog' => 'Bulog',
             'Koperasi Sejahtera' => 'Sejahtera',
             'Kop. Sejahtera' => 'Sejahtera',
             'Yayasan Pendidikan Nusantara' => 'Pendidikan Nusantara',
@@ -96,6 +95,7 @@ class IndonesianRulesTest extends TestCase
             'Kementerian Koperasi dan UKM' => 'Kementerian Koperasi dan UKM',
             'Dinas Koperasi Kota Bandung' => 'Dinas Koperasi Kota Bandung',
             'Sekolah Tinggi Yayasan Bhakti' => 'Sekolah Tinggi Yayasan Bhakti',
+            'Perum Griya Asri' => 'Perum Griya Asri',
             'PT Koperasi Maju Tbk' => 'Koperasi Maju',
             'PT. ABC, Tbk' => 'ABC,',
         ];
@@ -119,6 +119,14 @@ class IndonesianRulesTest extends TestCase
         $this->assertSame('Toko Buku Alat Tulis', $rules->apply('Toko Buku dan Alat Tulis'));
         $this->assertSame('Pergi pasar', $rules->apply('Pergi ke pasar'));
         $this->assertSame('Dandang Diam', $rules->apply('Dandang Diam'));
+    }
+
+    public function test_drop_stopwords_keeps_hyphenated_forms()
+    {
+        $rules = (new IndonesianRules())->dropStopwords();
+
+        $this->assertSame('HUT RI Ke-80', $rules->apply('HUT RI Ke-80'));
+        $this->assertSame('Juara Ke-2 Lomba', $rules->apply('Juara Ke-2 dan Lomba'));
     }
 
     public function test_drop_stopwords_accepts_extra_words()

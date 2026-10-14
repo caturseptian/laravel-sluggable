@@ -30,9 +30,12 @@ class Dictionary
         'univ' => 'universitas',
     ];
 
-    /** Penanda badan usaha di awal/akhir nama, dengan atau tanpa titik. */
+    /**
+     * Penanda badan usaha di awal/akhir nama, dengan atau tanpa titik. "Perum" sengaja tidak
+     * dimasukkan karena juga berarti perumahan ("Perum Griya Asri").
+     */
     const LEGAL_ENTITIES = [
-        'pt', 'cv', 'ud', 'tbk', 'persero', 'perum', 'koperasi', 'yayasan', 'firma',
+        'pt', 'cv', 'ud', 'tbk', 'persero', 'koperasi', 'yayasan', 'firma',
     ];
 
     /** Penanda badan usaha di awal/akhir nama yang hanya dikenali bila diikuti titik. */

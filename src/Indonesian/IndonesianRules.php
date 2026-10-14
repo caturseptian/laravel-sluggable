@@ -68,7 +68,8 @@ class IndonesianRules
         }
 
         if ($this->stopwords !== null) {
-            $pattern = '/'.self::NOT_WORD_BEFORE.'(?:'.$this->alternation($this->stopwords).')'.self::NOT_WORD_AFTER.'/iu';
+            // Tanda hubung setelahnya berarti bentuk terikat ("Ke-80"), bukan kata hubung.
+            $pattern = '/'.self::NOT_WORD_BEFORE.'(?:'.$this->alternation($this->stopwords).')(?![\p{L}\p{N}-])/iu';
             $text = preg_replace($pattern, ' ', $text);
         }
 
