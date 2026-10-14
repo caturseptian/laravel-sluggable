@@ -12,27 +12,30 @@ class Dictionary
         'prov' => 'provinsi',
         'jl' => 'jalan',
         'jln' => 'jalan',
-        'gg' => 'gang',
     ];
 
-    /** Singkatan yang hanya dikenali bila diikuti titik (rawan bentrok dengan kata biasa). */
+    /**
+     * Singkatan yang hanya dikenali bila diikuti titik dan tidak menempel ke singkatan lain
+     * (rawan bentrok dengan kata biasa atau gelar seperti S.H./M.H.). "Dr." sengaja tidak
+     * dipanjangkan karena bisa berarti doktor maupun dokter.
+     */
     const DOTTED_ABBREVIATIONS = [
         'no' => 'nomor',
+        'gg' => 'gang',
         'ds' => 'desa',
         'adm' => 'administrasi',
-        'dr' => 'dokter',
         'ir' => 'insinyur',
         'h' => 'haji',
         'hj' => 'hajah',
         'univ' => 'universitas',
     ];
 
-    /** Penanda badan usaha, dengan atau tanpa titik. */
+    /** Penanda badan usaha di awal/akhir nama, dengan atau tanpa titik. */
     const LEGAL_ENTITIES = [
         'pt', 'cv', 'ud', 'tbk', 'persero', 'perum', 'koperasi', 'yayasan', 'firma',
     ];
 
-    /** Penanda badan usaha yang hanya dikenali bila diikuti titik. */
+    /** Penanda badan usaha di awal/akhir nama yang hanya dikenali bila diikuti titik. */
     const DOTTED_LEGAL_ENTITIES = [
         'kop', 'fa',
     ];

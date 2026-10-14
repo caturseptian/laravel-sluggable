@@ -23,7 +23,6 @@ class IndonesianRulesTest extends TestCase
             'Gg. Mawar' => 'gang Mawar',
             'Ds. Sukamaju' => 'desa Sukamaju',
             'Kota Adm. Jakarta Pusat' => 'Kota administrasi Jakarta Pusat',
-            'Dr. Sutomo' => 'dokter Sutomo',
             'Ir. Soekarno' => 'insinyur Soekarno',
             'H. Agus Salim' => 'haji Agus Salim',
             'Hj. Siti' => 'hajah Siti',
@@ -46,6 +45,10 @@ class IndonesianRulesTest extends TestCase
             'Nomor Drama' => 'Nomor Drama',
             'No Name' => 'No Name',
             'H Agus' => 'H Agus',
+            'Jl. M.H. Thamrin No. 1' => 'jalan M.H. Thamrin nomor 1',
+            'Budi Santoso, S.H., M.H.' => 'Budi Santoso, S.H., M.H.',
+            'PT GG Indonesia' => 'PT GG Indonesia',
+            'Dr. Sutomo' => 'Dr. Sutomo',
         ];
 
         foreach ($cases as $input => $expected) {
@@ -83,6 +86,30 @@ class IndonesianRulesTest extends TestCase
         $rules = (new IndonesianRules())->dropLegalEntity();
 
         $this->assertSame('Ptolemy Cvetkovic Fakultas', $rules->apply('Ptolemy Cvetkovic Fakultas'));
+    }
+
+    public function test_drop_legal_entity_only_at_the_edges_or_in_parentheses()
+    {
+        $rules = (new IndonesianRules())->dropLegalEntity();
+
+        $cases = [
+            'Kementerian Koperasi dan UKM' => 'Kementerian Koperasi dan UKM',
+            'Dinas Koperasi Kota Bandung' => 'Dinas Koperasi Kota Bandung',
+            'Sekolah Tinggi Yayasan Bhakti' => 'Sekolah Tinggi Yayasan Bhakti',
+            'PT Koperasi Maju Tbk' => 'Koperasi Maju',
+            'PT. ABC, Tbk' => 'ABC,',
+        ];
+
+        foreach ($cases as $input => $expected) {
+            $this->assertSame($expected, $rules->apply($input), "Masukan: {$input}");
+        }
+    }
+
+    public function test_invalid_utf8_is_returned_unchanged_instead_of_failing()
+    {
+        $input = "Kab. \xE9t\xE9";
+
+        $this->assertSame($input, (new IndonesianRules())->expandAbbreviations()->dropLegalEntity()->dropStopwords()->apply($input));
     }
 
     public function test_drop_stopwords()
