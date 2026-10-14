@@ -158,11 +158,10 @@ class HasSlugTest extends TestCase
 
     public function test_it_transliterates_currency_symbols()
     {
-        // Transliterasi € berbeda antarversi Laravel: "a-euro" (6–7) dan "aeur" (versi baru).
+        // Transliterasi € milik Str::slug berbeda antarversi Laravel: "a" (6), "a-euro" (7–8), "aeur" (versi baru).
         $model = TestModel::create(['name' => 'a€']);
 
-        $this->assertStringStartsWith('a', $model->url);
-        $this->assertStringContainsString('eur', $model->url);
+        $this->assertSame(1, preg_match('/^a(-?euro?)?$/', $model->url), "Slug: {$model->url}");
     }
 
     public function test_it_can_handle_overwrites_when_updating_a_model()
