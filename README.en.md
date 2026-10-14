@@ -1,7 +1,13 @@
 # Laravel Sluggable
 
 [![tests](https://github.com/caturseptian/laravel-sluggable/actions/workflows/tests.yml/badge.svg)](https://github.com/caturseptian/laravel-sluggable/actions/workflows/tests.yml)
-[![Packagist](https://img.shields.io/packagist/v/caturseptian/laravel-sluggable.svg)](https://packagist.org/packages/caturseptian/laravel-sluggable)
+[![Packagist Version](https://img.shields.io/packagist/v/caturseptian/laravel-sluggable)](https://packagist.org/packages/caturseptian/laravel-sluggable)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/caturseptian/laravel-sluggable)](https://packagist.org/packages/caturseptian/laravel-sluggable)
+![PHP](https://img.shields.io/badge/PHP-7.2%20to%208.5-777bb4)
+![Laravel](https://img.shields.io/badge/Laravel-6%20to%2013-ff2d20)
+![License](https://img.shields.io/badge/license-MIT-blue)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-support-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/caturseptian)
+[![Trakteer](https://img.shields.io/badge/Trakteer-dukung-c0392b)](https://trakteer.id/caturseptian)
 
 [Bahasa Indonesia](README.md)
 
@@ -85,7 +91,7 @@ SlugOptions::create()
     ->indonesian(function ($rules) {
         return $rules
             ->expandAbbreviations()   // Kab. → kabupaten, Jl. → jalan, No. → nomor, ...
-            ->dropLegalEntity()       // PT, CV, UD, Tbk, (Persero), Perum, Koperasi, Yayasan, ...
+            ->dropLegalEntity()       // PT, CV, UD, Tbk, (Persero), Koperasi, Yayasan, ...
             ->dropStopwords();        // dan, di, ke, dari, yang, untuk, ...
     });
 ```

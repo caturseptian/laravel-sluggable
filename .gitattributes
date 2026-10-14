@@ -4,4 +4,3 @@
 /.gitignore         export-ignore
 /.editorconfig      export-ignore
 /phpunit.xml.dist   export-ignore
-/README.en.md       export-ignore
