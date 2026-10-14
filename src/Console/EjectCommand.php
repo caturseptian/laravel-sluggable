@@ -105,21 +105,69 @@ class EjectCommand extends Command
             return 0;
         }
 
-        foreach ($writes + $changed as $path => $contents) {
-            if (! $files->isDirectory(dirname($path))) {
-                $files->makeDirectory(dirname($path), 0755, true);
+        // Semua isi ditulis dulu ke lokasi sementara; baru setelah semuanya berhasil dipindahkan ke tempatnya, sehingga
+        // galat tulis tidak meninggalkan aplikasi setengah ter-eject.
+        $token = bin2hex(random_bytes(4));
+        $stage = $target.'.tmp-'.$token;
+        $parentExisted = is_dir(dirname($target));
+        $temps = [];
+        $failed = null;
+        foreach ($writes as $path => $contents) {
+            if (! $this->writeFile($stage.substr($path, strlen($target)), $contents)) {
+                $failed = $path;
+                break;
             }
-            if ($files->put($path, $contents) === false) {
-                $this->error("Gagal menulis {$path}");
+        }
+        if ($failed === null) {
+            foreach ($changed as $path => $contents) {
+                $tmp = $path.'.tmp-'.$token;
+                if (! $this->writeFile($tmp, $contents)) {
+                    $failed = $path;
+                    break;
+                }
+                $temps[$tmp] = $path;
+            }
+        }
+        if ($failed !== null) {
+            $files->deleteDirectory($stage);
+            foreach (array_keys($temps) as $tmp) {
+                @unlink($tmp);
+            }
+            if (! $parentExisted) {
+                @rmdir(dirname($target));
+            }
+            $this->error("Gagal menulis {$failed}; tidak ada file aplikasi yang diubah.");
 
-                return 1;
-            }
+            return 1;
+        }
+
+        $old = null;
+        if (file_exists($target)) {
+            $old = $target.'.old-'.$token;
+            rename($target, $old);
+        }
+        rename($stage, $target);
+        foreach ($temps as $tmp => $path) {
+            rename($tmp, $path);
+        }
+        if ($old !== null) {
+            $files->deleteDirectory($old);
         }
 
         $this->info("Selesai. Kode sluggable sekarang ada di {$target} ({$namespace}).");
         $this->line('Langkah terakhir: composer remove '.self::PACKAGE);
 
         return 0;
+    }
+
+    private function writeFile(string $path, string $contents): bool
+    {
+        $dir = dirname($path);
+        if (! is_dir($dir) && ! @mkdir($dir, 0755, true)) {
+            return false;
+        }
+
+        return @file_put_contents($path, $contents) !== false;
     }
 
     private function rewrite(string $contents, string $namespace): string

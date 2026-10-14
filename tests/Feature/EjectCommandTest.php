@@ -168,6 +168,27 @@ PHP
         }
     }
 
+    public function test_a_failed_write_leaves_the_app_untouched()
+    {
+        $locked = $this->root.'/app/Locked';
+        mkdir($locked);
+        file_put_contents($locked.'/Other.php', "<?php\n\nuse Caturseptian\\Sluggable\\Slug;\n");
+        chmod($locked, 0555);
+        $before = file_get_contents($this->root.'/app/Models/Post.php');
+
+        try {
+            $code = $this->eject();
+        } finally {
+            chmod($locked, 0755);
+        }
+
+        $this->assertSame(1, $code);
+        $this->assertPathMissing($this->root.'/app/Support/Sluggable');
+        $this->assertSame($before, file_get_contents($this->root.'/app/Models/Post.php'));
+        $this->assertSame([], glob($this->root.'/app/{,*/,*/*/}*.tmp-*', GLOB_BRACE) ?: []);
+        $this->assertSame([], glob($this->root.'/app/Support/*', GLOB_ONLYDIR) ?: []);
+    }
+
     public function test_dry_run_writes_nothing()
     {
         $before = file_get_contents($this->root.'/app/Models/Post.php');
