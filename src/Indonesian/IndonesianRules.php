@@ -53,38 +53,48 @@ class IndonesianRules
 
     public function apply(string $text): string
     {
+        if (! preg_match('//u', $text)) {
+            return $text;
+        }
+
         if ($this->expandAbbreviations) {
-            $text = $this->replaceWords(Dictionary::ABBREVIATIONS, '(?:\.|'.self::NOT_WORD_AFTER.')', $text);
-            $text = $this->replaceWords(Dictionary::DOTTED_ABBREVIATIONS, '\.', $text);
+            $text = $this->replaceWords(Dictionary::ABBREVIATIONS, self::NOT_WORD_BEFORE, '(?:\.|'.self::NOT_WORD_AFTER.')', $text);
+            $text = $this->replaceWords(Dictionary::DOTTED_ABBREVIATIONS, '(?<![\p{L}\p{N}.])', '\.', $text);
         }
 
         if ($this->dropLegalEntity) {
             $text = preg_replace('/\(\s*(?:'.$this->alternation(Dictionary::LEGAL_ENTITIES).')\s*\.?\s*\)/iu', ' ', $text);
-            $text = $this->removeWords(Dictionary::LEGAL_ENTITIES, '\.?'.self::NOT_WORD_AFTER, $text);
-            $text = $this->removeWords(Dictionary::DOTTED_LEGAL_ENTITIES, '\.', $text);
+            $text = $this->trimEntities($text);
         }
 
         if ($this->stopwords !== null) {
-            $text = $this->removeWords($this->stopwords, self::NOT_WORD_AFTER, $text);
+            $pattern = '/'.self::NOT_WORD_BEFORE.'(?:'.$this->alternation($this->stopwords).')'.self::NOT_WORD_AFTER.'/iu';
+            $text = preg_replace($pattern, ' ', $text);
         }
 
         return trim(preg_replace('/\s+/u', ' ', $text));
     }
 
-    private function replaceWords(array $map, string $ending, string $text): string
+    private function replaceWords(array $map, string $before, string $ending, string $text): string
     {
-        $pattern = '/'.self::NOT_WORD_BEFORE.'('.$this->alternation(array_keys($map)).')'.$ending.'/iu';
+        $pattern = '/'.$before.'('.$this->alternation(array_keys($map)).')'.$ending.'/iu';
 
         return preg_replace_callback($pattern, function (array $match) use ($map) {
             return ' '.$map[mb_strtolower($match[1])].' ';
         }, $text);
     }
 
-    private function removeWords(array $words, string $ending, string $text): string
+    /**
+     * Buang satu penanda badan usaha di awal dan satu di akhir nama ("PT ... Tbk").
+     */
+    private function trimEntities(string $text): string
     {
-        $pattern = '/'.self::NOT_WORD_BEFORE.'(?:'.$this->alternation($words).')'.$ending.'/iu';
+        $entity = '(?:(?:'.$this->alternation(Dictionary::LEGAL_ENTITIES).')\.?'
+            .'|(?:'.$this->alternation(Dictionary::DOTTED_LEGAL_ENTITIES).')\.)';
+        $leading = '/^\s*'.$entity.self::NOT_WORD_AFTER.'/iu';
+        $trailing = '/'.self::NOT_WORD_BEFORE.$entity.'\s*$/iu';
 
-        return preg_replace($pattern, ' ', $text);
+        return preg_replace([$leading, $trailing], ' ', $text);
     }
 
     /**
