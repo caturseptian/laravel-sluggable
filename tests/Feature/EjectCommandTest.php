@@ -101,6 +101,58 @@ PHP;
         $this->assertStringNotContainsString('Caturseptian\\Sluggable', $model);
     }
 
+    public function test_it_rewrites_only_the_exact_package_namespace()
+    {
+        file_put_contents($this->root.'/app/Models/Other.php', <<<'PHP'
+<?php
+
+namespace App\Models;
+
+use Caturseptian\Sluggable as S;
+use Caturseptian\SluggableExtras\Foo;
+
+class Other
+{
+    const TRAIT_NAME = 'Caturseptian\\Sluggable\\HasSlug';
+}
+PHP
+        );
+
+        $this->eject();
+
+        $other = file_get_contents($this->root.'/app/Models/Other.php');
+        $escaped = str_replace('\\', '\\\\', $this->namespace);
+
+        $this->assertStringContainsString('use '.$this->namespace.' as S;', $other);
+        $this->assertStringContainsString('use Caturseptian\\SluggableExtras\\Foo;', $other);
+        $this->assertStringContainsString("'".$escaped.'\\\\HasSlug'."'", $other);
+    }
+
+    public function test_default_scan_covers_common_laravel_folders()
+    {
+        $this->app->setBasePath($this->root);
+        (new Filesystem())->makeDirectory($this->root.'/routes', 0755, true);
+        file_put_contents($this->root.'/routes/web.php', "<?php\n\nuse Caturseptian\\Sluggable\\Slug;\n");
+
+        $this->assertSame(0, Artisan::call('sluggable:eject', ['--namespace' => $this->namespace]));
+
+        $this->assertFileExists($this->root.'/app/Support/Sluggable/Slug.php');
+        $this->assertStringContainsString('use '.$this->namespace.'\\Slug;', file_get_contents($this->root.'/routes/web.php'));
+    }
+
+    public function test_it_warns_about_references_outside_the_scanned_folders()
+    {
+        $this->app->setBasePath($this->root);
+        (new Filesystem())->makeDirectory($this->root.'/routes', 0755, true);
+        file_put_contents($this->root.'/routes/web.php', "<?php\n\nuse Caturseptian\\Sluggable\\Slug;\n");
+
+        $this->assertSame(0, Artisan::call('sluggable:eject', ['--namespace' => $this->namespace, '--scan' => ['app']]));
+
+        $output = Artisan::output();
+        $this->assertStringContainsString('masih merujuk', $output);
+        $this->assertStringContainsString('routes/web.php', $output);
+    }
+
     public function test_dry_run_writes_nothing()
     {
         $before = file_get_contents($this->root.'/app/Models/Post.php');
