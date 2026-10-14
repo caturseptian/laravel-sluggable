@@ -153,6 +153,21 @@ PHP
         $this->assertStringContainsString('routes/web.php', $output);
     }
 
+    public function test_invalid_namespace_is_refused_and_writes_nothing()
+    {
+        foreach (['App/Support/Sluggable', 'AppSupport Sluggable', '1App\\Sluggable'] as $namespace) {
+            $code = Artisan::call('sluggable:eject', [
+                '--path' => $this->root.'/app/Support/Sluggable',
+                '--namespace' => $namespace,
+                '--scan' => [$this->root.'/app'],
+            ]);
+
+            $this->assertSame(1, $code, $namespace);
+            $this->assertStringContainsString('Namespace tidak valid', Artisan::output());
+            $this->assertPathMissing($this->root.'/app/Support/Sluggable');
+        }
+    }
+
     public function test_dry_run_writes_nothing()
     {
         $before = file_get_contents($this->root.'/app/Models/Post.php');

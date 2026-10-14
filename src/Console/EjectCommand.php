@@ -45,6 +45,12 @@ class EjectCommand extends Command
         $scan = $this->option('scan') ?: self::DEFAULT_SCAN;
         $dryRun = (bool) $this->option('dry-run');
 
+        if (! preg_match('/^[A-Za-z_][A-Za-z0-9_]*(\\\\[A-Za-z_][A-Za-z0-9_]*)*$/', $namespace)) {
+            $this->error("Namespace tidak valid: {$namespace}. Contoh: --namespace=\"App\\Support\\Sluggable\" (beri tanda kutip).");
+
+            return 1;
+        }
+
         if ($files->exists($target) && ! $this->option('force')) {
             $this->error("Folder {$target} sudah ada. Pakai --force untuk menimpanya.");
 
