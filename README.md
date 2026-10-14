@@ -32,9 +32,10 @@ composer remove caturseptian/laravel-sluggable
 ```
 
 Eject menyalin kode ke `app/Support/Sluggable` (namespace `App\Support\Sluggable`), mengganti
-import `Caturseptian\Sluggable\...` di folder `app/`, dan menyertakan `LICENSE-sluggable`.
-Opsi: `--path=`, `--namespace=`, `--scan=` (bisa berulang, mis. `--scan=app --scan=database`),
-`--dry-run`, `--force`.
+rujukan `Caturseptian\Sluggable` di folder `app`, `config`, `database`, `routes`, dan `tests`, lalu
+menyertakan `LICENSE-sluggable`. Rujukan di luar folder itu tidak diubah, tetapi ditampilkan sebagai
+peringatan. Opsi: `--path=`, `--namespace=` (beri tanda kutip, mis. `--namespace="Domain\Slug"`),
+`--scan=` (bisa berulang), `--dry-run`, `--force`.
 
 ## Pemakaian
 
@@ -69,7 +70,7 @@ Migrasi: `$table->string('slug')->unique();`
 | `usingSeparator('_')` | pemisah (default `-`) |
 | `usingLanguage('de')` | bahasa transliterasi `Str::slug` (default `en`) |
 | `doNotGenerateSlugsOnCreate()` / `doNotGenerateSlugsOnUpdate()` | matikan pada event tertentu |
-| `preventOverwrite()` | jangan timpa slug yang sudah terisi |
+| `preventOverwrite()` | jangan pernah membuat ulang slug yang sudah terisi (slug manual tidak dicek keunikannya) |
 | `skipGenerateWhen(function ($model) { return ...; })` | lewati kondisi tertentu |
 | `extraScope(function ($query) { $query->where('tenant_id', 1); })` | keunikan per lingkup |
 | `startSlugSuffixFrom(2)` | suffix pertama (default 1) |

@@ -32,9 +32,10 @@ composer remove caturseptian/laravel-sluggable
 ```
 
 Eject copies the code to `app/Support/Sluggable` (namespace `App\Support\Sluggable`), rewrites
-`Caturseptian\Sluggable\...` imports in the `app/` folder, and includes `LICENSE-sluggable`.
-Options: `--path=`, `--namespace=`, `--scan=` (repeatable, e.g. `--scan=app --scan=database`),
-`--dry-run`, `--force`.
+`Caturseptian\Sluggable` references in the `app`, `config`, `database`, `routes`, and `tests` folders,
+and includes `LICENSE-sluggable`. References outside those folders are left unchanged but listed as
+a warning. Options: `--path=`, `--namespace=` (quote it, e.g. `--namespace="Domain\Slug"`),
+`--scan=` (repeatable), `--dry-run`, `--force`.
 
 ## Usage
 
@@ -69,7 +70,7 @@ Migration: `$table->string('slug')->unique();`
 | `usingSeparator('_')` | separator (default `-`) |
 | `usingLanguage('de')` | `Str::slug` transliteration language (default `en`) |
 | `doNotGenerateSlugsOnCreate()` / `doNotGenerateSlugsOnUpdate()` | disable on a given event |
-| `preventOverwrite()` | never overwrite a slug that is already filled |
+| `preventOverwrite()` | never regenerate a slug that is already filled (a manual slug is not checked for uniqueness) |
 | `skipGenerateWhen(function ($model) { return ...; })` | skip under a condition |
 | `extraScope(function ($query) { $query->where('tenant_id', 1); })` | scoped uniqueness |
 | `startSlugSuffixFrom(2)` | first suffix (default 1) |
