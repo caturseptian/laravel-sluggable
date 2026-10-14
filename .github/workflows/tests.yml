@@ -38,10 +38,12 @@ jobs:
         with:
           php: ${{ matrix.php }}
           extensions: pdo_sqlite, sqlite3, mbstring
+          tools: composer:v2
           coverage: none
 
       - name: Izinkan paket Laravel lama yang punya advisory (khusus CI)
-        run: composer config audit.block-insecure false
+        # Kunci ini baru ada di Composer 2.9; versi sebelumnya memang tidak memblokir.
+        run: composer config audit.block-insecure false || true
 
       - name: Kunci versi Laravel
         run: |
