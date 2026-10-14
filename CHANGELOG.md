@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2026-10-14
+
+- `dropStopwords` tidak lagi membuang bentuk bertanda hubung: "HUT RI Ke-80" tetap `hut-ri-ke-80`.
+- `dropLegalEntity` tidak lagi membuang "Perum" karena juga berarti perumahan ("Perum Griya Asri").
+- `sluggable:eject` menolak `--namespace` yang tidak valid (mis. memakai `/` atau backslash yang hilang karena tidak dikutip) tanpa menulis apa pun.
+- `README.en.md` ikut terpasang sehingga tautan bahasa di README berfungsi di `vendor/`.
+
 ## 1.0.0 - 2026-10-13
 
 Rilis pertama sebagai paket mandiri.
