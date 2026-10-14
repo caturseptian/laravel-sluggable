@@ -25,4 +25,9 @@ class InvalidOption extends Exception
     {
         return new static('Slug suffix should start from one or higher');
     }
+
+    public static function suffixExceedsMaximumLength()
+    {
+        return new static('Maximum length is too short to fit a unique slug suffix');
+    }
 }

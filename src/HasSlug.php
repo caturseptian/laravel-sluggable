@@ -139,6 +139,9 @@ trait HasSlug
 
         while ($slug === '' || $this->otherRecordExistsWithSlug($slug)) {
             $suffix = $this->slugOptions->slugSeparator.$i++;
+            if (strlen($suffix) > $this->slugOptions->maximumLength) {
+                throw InvalidOption::suffixExceedsMaximumLength();
+            }
             $slug = $this->truncateSlug($base, $this->slugOptions->maximumLength - strlen($suffix)).$suffix;
         }
 

@@ -115,6 +115,24 @@ class HasSlugOptionsTest extends TestCase
         $this->assertEquals('abcde', $model->url);
     }
 
+    public function test_suffix_that_cannot_fit_the_maximum_length_is_rejected()
+    {
+        $options = function () {
+            return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('url')->slugsShouldBeNoLongerThan(1);
+        };
+
+        $first = (new TestModel())->setSlugOptions($options());
+        $first->name = 'a';
+        $first->save();
+        $this->assertEquals('a', $first->url);
+
+        $this->expectException(InvalidOption::class);
+
+        $second = (new TestModel())->setSlugOptions($options());
+        $second->name = 'a';
+        $second->save();
+    }
+
     public function test_non_incrementing_model_without_key_still_gets_unique_slug()
     {
         TestUuidModel::create(['name' => 'judul']);
